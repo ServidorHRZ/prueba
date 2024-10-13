@@ -1,0 +1,16 @@
+{
+    "usuarios": [
+      {
+        "nombre": "usuario1",
+        "contrasena": "linux123"
+      },
+      {
+        "nombre": "usuario2",
+        "contrasena": "tux456"
+      },
+      {
+        "nombre": "admin",
+        "contrasena": "superadmin789"
+      }
+    ]
+  }

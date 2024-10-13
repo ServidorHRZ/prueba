@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido - Curso Basico de Linux</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg">
+    <style>
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: #2c001e;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .welcome-container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #dd4814;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .menu-item {
+            background-color: #dd4814;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .menu-item:hover {
+            background-color: #c1390f;
+        }
+        .week-content {
+            display: none;
+        }
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .video-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .video-box:hover {
+            transform: translateY(-5px);
+        }
+        .video-title {
+            background-color: #dd4814;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .video-frame {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-frame iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .hamburger-menu {
+            display: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        @media (max-width: 768px) {
+            .menu {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: #2c001e;
+                z-index: 1;
+            }
+            .menu.show {
+                display: flex;
+            }
+            .menu-item {
+                margin-bottom: 10px;
+            }
+            .hamburger-menu {
+                display: block;
+                position: absolute;
+                background-color: #dd4814;
+                padding: 5px;
+                border-radius: 5px;
+                top: 20px;
+                right: 20px;
+            }
+            .video-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #dd4814;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .logout-button:hover {
+            background-color: #c1390f;
+        }
+        @media (max-width: 768px) {
+            .logout-button {
+                top: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Bienvenido al Curso Basico de Linux</h1>
+        <p>Has iniciado sesión correctamente.</p>
+    </div>
+
+    <button class="logout-button" onclick="cerrarSesion()">Cerrar Sesión</button>
+
+    <div class="hamburger-menu" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="menu" id="menu">
+        <div class="menu-item" onclick="showWeek(1)">Semana 1</div>
+        <div class="menu-item" onclick="showWeek(2)">Semana 2</div>
+        <div class="menu-item" onclick="showWeek(3)">Semana 3</div>
+        <div class="menu-item" onclick="showWeek(4)">Semana 4</div>
+    </div>
+
+    <div id="week1" class="week-content">
+        <h2>Semana 1</h2>
+        <div class="video-container" id="video-container-1"></div>
+    </div>
+
+    <div id="week2" class="week-content">
+        <h2>Semana 2</h2>
+        <div class="video-container" id="video-container-2"></div>
+    </div>
+
+    <div id="week3" class="week-content">
+        <h2>Semana 3</h2>
+        <div class="video-container" id="video-container-3"></div>
+    </div>
+
+    <div id="week4" class="week-content">
+        <h2>Semana 4</h2>
+        <div class="video-container" id="video-container-4"></div>
+    </div>
+
+    <script>
+        let videosData;
+
+        fetch('videos.json')
+            .then(response => response.json())
+            .then(data => {
+                videosData = data;
+                loadVideos();
+            })
+            .catch(error => console.error('Error cargando los videos:', error));
+
+        function loadVideos() {
+            for (let i = 1; i <= 4; i++) {
+                const container = document.getElementById(`video-container-${i}`);
+                const weekVideos = videosData[`semana${i}`];
+                
+                weekVideos.forEach(video => {
+                    const videoBox = document.createElement('div');
+                    videoBox.className = 'video-box';
+                    videoBox.innerHTML = `
+                        <div class="video-title">${video.titulo}</div>
+                        <div class="video-frame">
+                            <iframe src="${video.url}" allow="autoplay"></iframe>
+                        </div>
+                    `;
+                    container.appendChild(videoBox);
+                });
+            }
+        }
+
+        function showWeek(weekNumber) {
+            const weeks = document.getElementsByClassName('week-content');
+            for (let i = 0; i < weeks.length; i++) {
+                weeks[i].style.display = 'none';
+            }
+            document.getElementById('week' + weekNumber).style.display = 'block';
+            if (window.innerWidth <= 768) {
+                toggleMenu();
+            }
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('show');
+        }
+
+        function cerrarSesion() {
+            // Eliminar cualquier dato de sesión almacenado localmente
+            localStorage.removeItem('sesionIniciada');
+            
+            // Redirigir al login
+            window.location.href = 'login.html';
+        }
+
+        // Verificar si el usuario está autenticado
+        function verificarAutenticacion() {
+            if (!localStorage.getItem('sesionIniciada')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Llamar a la función de verificación al cargar la página
+        verificarAutenticacion();
+
+        // Prevenir la navegación hacia atrás después de cerrar sesión
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            window.history.go(1);
+        };
+
+        // Mostrar la primera semana por defecto
+        showWeek(1);
+    </script>
+</body>
+</html>
